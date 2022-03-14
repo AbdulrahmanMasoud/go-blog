@@ -13,8 +13,8 @@ func main() {
 	conn := database.Connection(db)
 
 	defer conn.Close()
-
-	db.AutoMigrate(&models.User{})
+	//db.Migrator().DropTable(&models.Blog{})
+	db.AutoMigrate(&models.User{}, &models.Blog{})
 
 	route := gin.Default()
 	route.POST("/register", controllers.Register)
@@ -23,6 +23,16 @@ func main() {
 	route.Use(middlewares.IsAuth())
 	{
 		route.GET("/profile", controllers.Profile)
+
+		//Blog Resource
+		blogs := route.Group("/blogs")
+		{
+			blogs.GET("/", controllers.Index)
+			blogs.GET("/:id", controllers.Show)
+			blogs.POST("/store", controllers.Store)
+			blogs.PUT("/:id/update", controllers.Update)
+			blogs.DELETE("/:id/delete", controllers.Delete)
+		}
 	}
 
 	route.Run()

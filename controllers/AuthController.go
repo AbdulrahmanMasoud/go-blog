@@ -61,11 +61,8 @@ func Login(c *gin.Context) {
 func Profile(c *gin.Context) {
 	db := database.Connect()
 	var user models.User
-	userId, err := token.ExtractTokenID(c)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
+	userId, _ := token.ExtractTokenID(c)
+
 	db.Find(&user, userId)
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
