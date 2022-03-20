@@ -17,7 +17,6 @@ func Index(c *gin.Context) {
 }
 
 func Show(c *gin.Context) {
-
 	db := database.Connect()
 	var blog models.Blog
 	db.Where("id =?", c.Param("id")).First(&blog)
@@ -25,6 +24,18 @@ func Show(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Not found this blog"})
 		return
 	}
+	c.JSON(http.StatusOK, gin.H{"data": blog})
+}
+
+// ShowByUser Show blogs by user
+func ShowByUser(c *gin.Context) {
+	db := database.Connect()
+	var blog []models.Blog
+	db.Debug().Where("user_id =?", c.Param("user_id")).Find(&blog)
+	//if blog.ID == 0 {
+	//	c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Not found this blog"})
+	//	return
+	//}
 	c.JSON(http.StatusOK, gin.H{"data": blog})
 }
 

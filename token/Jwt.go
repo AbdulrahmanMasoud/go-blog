@@ -11,6 +11,7 @@ import (
 
 const SecretKey = "secret"
 
+// GenerateToken -> To Generate token by user id
 func GenerateToken(userId uint) (string, error) {
 	tokenLifespan, err := strconv.Atoi("2400")
 
@@ -22,9 +23,22 @@ func GenerateToken(userId uint) (string, error) {
 	claims["authorized"] = true
 	claims["user_id"] = userId
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //generate token with given data
 
 	return token.SignedString([]byte(SecretKey))
+}
+
+// ExtractToken -> To get token from request
+func ExtractToken(c *gin.Context) string {
+	token := c.Query("token")
+	if token != "" {
+		return token
+	}
+	bearerToken := c.Request.Header.Get("Authorization")
+	if len(strings.Split(bearerToken, " ")) == 2 {
+		return strings.Split(bearerToken, " ")[1]
+	}
+	return ""
 }
 
 func TokenValid(c *gin.Context) error {
@@ -41,18 +55,7 @@ func TokenValid(c *gin.Context) error {
 	return nil
 }
 
-func ExtractToken(c *gin.Context) string {
-	token := c.Query("token")
-	if token != "" {
-		return token
-	}
-	bearerToken := c.Request.Header.Get("Authorization")
-	if len(strings.Split(bearerToken, " ")) == 2 {
-		return strings.Split(bearerToken, " ")[1]
-	}
-	return ""
-}
-
+// ExtractTokenID -> To return user id by given token
 func ExtractTokenID(c *gin.Context) (uint, error) {
 
 	tokenString := ExtractToken(c)

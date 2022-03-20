@@ -32,6 +32,9 @@ func main() {
 			blogs.POST("/store", controllers.Store)
 			blogs.PUT("/:id/update", controllers.Update)
 			blogs.DELETE("/:id/delete", controllers.Delete)
+
+			// By User
+			blogs.GET("user/:user_id", controllers.ShowByUser)
 		}
 	}
 

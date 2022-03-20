@@ -30,15 +30,17 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	//To ge binded password
+	password := user.Password
 	db.Where("email = ?", user.Email).First(&user)
-
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Not Found This User"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Email Or Password is wrong"})
 		return
 	}
-	err := user.VerifyPassword(user.Password, "password")
+
+	err := user.ComparePassword(password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Email Or Password is wrong"})
 		return
 	}
 
