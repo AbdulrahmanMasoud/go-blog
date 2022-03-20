@@ -16,10 +16,11 @@ func Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": blogs})
 }
 
+// Show blog by id or slug
 func Show(c *gin.Context) {
 	db := database.Connect()
 	var blog models.Blog
-	db.Where("id =?", c.Param("id")).First(&blog)
+	db.Where("id =?", c.Param("id")).Or("slug =?", c.Param("id")).First(&blog)
 	if blog.ID == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Not found this blog"})
 		return
